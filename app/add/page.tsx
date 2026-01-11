@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { vocabularyDB } from '@/lib/db';
 import { createNewVocabulary } from '@/lib/srs';
+import { parseWordReferenceData, SCRAPER_INSTRUCTIONS } from '@/lib/wordreference';
 
 export default function AddWord() {
   const router = useRouter();
@@ -11,9 +12,25 @@ export default function AddWord() {
   const [translation, setTranslation] = useState('');
   const [example, setExample] = useState('');
   const [notes, setNotes] = useState('');
-  const [sourceLanguage, setSourceLanguage] = useState('en');
-  const [targetLanguage, setTargetLanguage] = useState('es');
+  const [gender, setGender] = useState<'le' | 'la' | 'les' | "l'" | ''>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importData, setImportData] = useState('');
+
+  const handleImport = () => {
+    const data = parseWordReferenceData(importData);
+    if (data) {
+      setWord(data.word);
+      setTranslation(data.translation);
+      setExample(data.example || '');
+      setGender(data.gender || '');
+      setImportData('');
+      setShowImport(false);
+      alert('Data imported! Review and submit.');
+    } else {
+      alert('Invalid data format. Please check and try again.');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +40,9 @@ export default function AddWord() {
       const newVocab = createNewVocabulary(
         word,
         translation,
-        sourceLanguage,
-        targetLanguage,
         example || undefined,
-        notes || undefined
+        notes || undefined,
+        gender || undefined
       );
 
       await vocabularyDB.addWord(newVocab);
@@ -36,9 +52,10 @@ export default function AddWord() {
       setTranslation('');
       setExample('');
       setNotes('');
+      setGender('');
       
-      // Show success message briefly
-      alert('Word added successfully!');
+      // Show success briefly
+      alert('Word added! ✓');
     } catch (error) {
       console.error('Error adding word:', error);
       alert('Failed to add word. Please try again.');
@@ -48,23 +65,56 @@ export default function AddWord() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
+    <div className="min-h-screen bg-gray-900">
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="mb-6 flex justify-between items-center">
           <button
-            onClick={() => router.push('/')}
-            className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+            onClick={() => router.push('/?admin=true')}
+            className="text-cyan-400 hover:text-cyan-300 flex items-center gap-2"
           >
-            ← Back to Home
+            ← Back
+          </button>
+          <button
+            onClick={() => setShowImport(!showImport)}
+            className="text-cyan-400 hover:text-cyan-300 text-sm"
+          >
+            {showImport ? 'Manual Entry' : 'Import from WordReference'}
           </button>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Add New Word</h1>
+        <h1 className="text-4xl font-bold text-white mb-2">Add Word</h1>
+        <p className="text-gray-400 mb-8">French → English</p>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
+        {showImport && (
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
+            <h3 className="text-white font-semibold mb-3">Import from WordReference</h3>
+            <p className="text-gray-400 text-sm mb-4">
+              Use the bookmarklet while browsing WordReference, then paste the JSON here.
+            </p>
+            <textarea
+              value={importData}
+              onChange={(e) => setImportData(e.target.value)}
+              placeholder='{"word":"maison","translation":"house","example":"...","gender":"la"}'
+              rows={3}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm mb-3"
+            />
+            <button
+              onClick={handleImport}
+              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-4 rounded-lg"
+            >
+              Import Data
+            </button>
+            <details className="mt-4">
+              <summary className="text-cyan-400 text-sm cursor-pointer">Show bookmarklet instructions</summary>
+              <pre className="text-xs text-gray-400 mt-2 whitespace-pre-wrap">{SCRAPER_INSTRUCTIONS}</pre>
+            </details>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="word" className="block text-sm font-medium text-gray-700 mb-2">
-              Word *
+            <label htmlFor="word" className="block text-sm font-medium text-gray-300 mb-2">
+              French Word *
             </label>
             <input
               type="text"
@@ -72,14 +122,32 @@ export default function AddWord() {
               value={word}
               onChange={(e) => setWord(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter word"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              placeholder="maison"
             />
           </div>
 
           <div>
-            <label htmlFor="translation" className="block text-sm font-medium text-gray-700 mb-2">
-              Translation *
+            <label htmlFor="gender" className="block text-sm font-medium text-gray-300 mb-2">
+              Gender (Optional)
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value as any)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            >
+              <option value="">Select...</option>
+              <option value="le">le (masculine)</option>
+              <option value="la">la (feminine)</option>
+              <option value="les">les (plural)</option>
+              <option value="l'">l' (vowel start)</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="translation" className="block text-sm font-medium text-gray-300 mb-2">
+              English Translation *
             </label>
             <input
               type="text"
@@ -87,53 +155,13 @@ export default function AddWord() {
               value={translation}
               onChange={(e) => setTranslation(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter translation"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              placeholder="house"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="sourceLanguage" className="block text-sm font-medium text-gray-700 mb-2">
-                Source Language
-              </label>
-              <select
-                id="sourceLanguage"
-                value={sourceLanguage}
-                onChange={(e) => setSourceLanguage(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-                <option value="it">Italian</option>
-                <option value="pt">Portuguese</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 mb-2">
-                Target Language
-              </label>
-              <select
-                id="targetLanguage"
-                value={targetLanguage}
-                onChange={(e) => setTargetLanguage(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-                <option value="it">Italian</option>
-                <option value="pt">Portuguese</option>
-              </select>
-            </div>
-          </div>
-
           <div>
-            <label htmlFor="example" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="example" className="block text-sm font-medium text-gray-300 mb-2">
               Example Sentence (Optional)
             </label>
             <textarea
@@ -141,29 +169,29 @@ export default function AddWord() {
               value={example}
               onChange={(e) => setExample(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter example sentence"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              placeholder="J'habite dans une grande maison."
             />
           </div>
 
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-2">
               Notes (Optional)
             </label>
             <textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Add any notes or context"
+              rows={2}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              placeholder="Add context or mnemonics..."
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none"
           >
             {isSubmitting ? 'Adding...' : 'Add Word'}
           </button>

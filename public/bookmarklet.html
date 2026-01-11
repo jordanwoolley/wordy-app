@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordy - WordReference Bookmarklet</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #16213e;
+      color: #fff;
+    }
+    h1 {
+      background: linear-gradient(to right, #06b6d4, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .bookmarklet {
+      background: #1f2937;
+      border: 2px solid #374151;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .drag-btn {
+      display: inline-block;
+      background: linear-gradient(to right, #06b6d4, #3b82f6);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: move;
+      margin: 10px 0;
+    }
+    .drag-btn:hover {
+      opacity: 0.9;
+    }
+    code {
+      background: #111827;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .step {
+      background: #1f2937;
+      padding: 15px;
+      margin: 10px 0;
+      border-left: 4px solid #06b6d4;
+      border-radius: 4px;
+    }
+    pre {
+      background: #111827;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 Wordy - WordReference Import Tool</h1>
+  
+  <p>Drag this button to your bookmarks bar to quickly extract vocabulary from WordReference:</p>
+  
+  <div class="bookmarklet">
+    <a href="javascript:(function(){const w=document.querySelector('.FrWrd strong')?.textContent?.trim()||'';const t=Array.from(document.querySelectorAll('.ToWrd')).map(e=>e.textContent.trim()).filter(Boolean);const ex=Array.from(document.querySelectorAll('.FrEx')).map(e=>e.textContent.trim()).filter(Boolean);const g=document.querySelector('.FrWrd .POS2')?.textContent?.match(/\b(nm|nf|nmpl|nfpl)\b/)?.[0]||'';const gm={'nm':'le','nf':'la','nmpl':'les','nfpl':'les'};const d={word:w.toLowerCase(),translation:t[0]?.toLowerCase()||'',example:ex[0]||'',gender:gm[g]||''};const modal=document.createElement('div');modal.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1f2937;color:#fff;padding:30px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.5);z-index:999999;max-width:500px;border:2px solid #06b6d4';const content=`<h2 style='margin:0 0 15px;color:#06b6d4'>📚 Wordy - Word Extracted!</h2><pre style='background:#111;padding:15px;border-radius:8px;overflow-x:auto;margin:15px 0'>${JSON.stringify(d,null,2)}</pre><p style='margin:10px 0;color:#9ca3af;font-size:14px'>Copy this JSON and paste it into Wordy's import field.</p><button id='copyBtn' style='background:linear-gradient(to right,#06b6d4,#3b82f6);color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:bold;width:100%;margin-top:10px'>Copy to Clipboard</button><button id='closeBtn' style='background:#374151;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px;width:100%'>Close</button>`;modal.innerHTML=content;document.body.appendChild(modal);document.getElementById('copyBtn').onclick=()=>{navigator.clipboard.writeText(JSON.stringify(d));alert('✓ Copied! Now paste in Wordy.')};document.getElementById('closeBtn').onclick=()=>modal.remove();})();" class="drag-btn">
+      Extract to Wordy
+    </a>
+    <p style="color: #9ca3af; font-size: 14px; margin-top: 10px;">
+      ⬆️ Drag this button to your bookmarks bar
+    </p>
+  </div>
+
+  <h2>How to Use</h2>
+  
+  <div class="step">
+    <strong>Step 1:</strong> Drag the button above to your browser's bookmarks bar
+  </div>
+  
+  <div class="step">
+    <strong>Step 2:</strong> Go to WordReference.com and search for a French word (e.g., "maison")
+  </div>
+  
+  <div class="step">
+    <strong>Step 3:</strong> Click the "Extract to Wordy" bookmark
+  </div>
+  
+  <div class="step">
+    <strong>Step 4:</strong> A popup will show the extracted data. Click "Copy to Clipboard"
+  </div>
+  
+  <div class="step">
+    <strong>Step 5:</strong> In Wordy, click "Import from WordReference" and paste the JSON
+  </div>
+
+  <h2>What Gets Extracted</h2>
+  <ul>
+    <li><strong>Word:</strong> The French word (automatically lowercased)</li>
+    <li><strong>Translation:</strong> The primary English translation</li>
+    <li><strong>Example:</strong> Example sentence (if available)</li>
+    <li><strong>Gender:</strong> Noun gender (le, la, les) if it's a noun</li>
+  </ul>
+
+  <h2>Example Output</h2>
+  <pre>{
+  "word": "maison",
+  "translation": "house",
+  "example": "J'habite dans une grande maison.",
+  "gender": "la"
+}</pre>
+
+  <h2>Troubleshooting</h2>
+  <p><strong>Bookmarklet doesn't work?</strong></p>
+  <ul>
+    <li>Make sure you're on a WordReference page with a translation</li>
+    <li>Some browsers block bookmarklets - try copying the code manually</li>
+    <li>Check your browser console for error messages</li>
+  </ul>
+
+  <p><strong>Missing data?</strong></p>
+  <ul>
+    <li>Not all fields may be available for every word</li>
+    <li>You can fill in missing information manually in Wordy</li>
+  </ul>
+
+  <hr style="margin: 40px 0; border: 1px solid #374151;">
+  
+  <p style="text-align: center; color: #6b7280;">
+    Happy learning! 🇫🇷→🇬🇧
+  </p>
+</body>
+</html>

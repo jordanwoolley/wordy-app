@@ -1,25 +1,29 @@
-# Wordy - Vocabulary SRS App
+# Wordy - French Vocabulary SRS App
 
-A spaced repetition flashcard web app for vocabulary practice, optimized for iOS and deployable on Vercel.
+A minimal, WaniKani-inspired spaced repetition flashcard web app for mastering French vocabulary. Optimized for iOS with PWA support, deployable on Vercel.
 
-## Features
+## ✨ Features
 
-- 📚 Add and manage vocabulary words with translations
-- 🧠 SM-2 spaced repetition algorithm (like WaniKani)
-- 📱 PWA support for iOS - install as a native-like app
-- 💾 Client-side storage with IndexedDB
-- 📊 Progress tracking and statistics
-- 🎨 Clean, mobile-optimized interface
+- 🎯 **Auto-Launch Reviews** - Opens directly to your daily reviews
+- 🧠 **SM-2 Spaced Repetition** - Intelligent review scheduling like WaniKani
+- 🇫🇷 **French-English Focus** - Specialized for French learners with gender support
+- 📱 **PWA for iOS** - Install as a native-like app on your iPhone
+- 💾 **IndexedDB Storage** - Persistent local storage, works offline
+- 🎨 **Minimal Dark UI** - Clean, distraction-free design with vibrant accents
+- 📊 **Progress Tracking** - View stats and review history
+- 🔧 **Admin Panel** - Top-right settings button for managing vocabulary
+- 📖 **WordReference Import** - Bookmarklet to quickly extract words from WordReference
 
-## Tech Stack
+## 🎨 Design Philosophy
 
-- **Next.js 16** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **IndexedDB** - Local storage
-- **PWA** - Progressive Web App features
+Inspired by WaniKani's minimal aesthetic:
+- Dark background (#16213e) for reduced eye strain
+- Vibrant cyan-blue gradient accents
+- Large, readable flashcards
+- Simple, focused interface
+- Auto-lowercase for consistency
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Development
 
@@ -28,68 +32,107 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+Open [http://localhost:3000](http://localhost:3000) - if you have reviews, it'll launch straight into them!
 
 ### Deploy to Vercel
 
-The easiest way to deploy:
-
 1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your repository
-4. Deploy!
+2. Go to [vercel.com](https://vercel.com) and import your repository
+3. Deploy! Vercel auto-detects Next.js
 
-Vercel will automatically detect Next.js and configure everything.
+## 📖 Usage
 
-## Usage
+### Daily Workflow
 
-1. **Add Words**: Click "Add New Word" to add vocabulary
-2. **Review**: Click "Start Review" when words are due
-3. **Rate Your Recall**: After reviewing, rate how well you knew the word:
-   - ❌ Again - Forgot completely (resets the card)
-   - 😐 Hard - Difficult to recall
-   - 👍 Good - Recalled correctly
-   - ✨ Easy - Perfect recall
+1. Open the app - **automatically launches into reviews** if words are due
+2. Review each word and rate your recall:
+   - **Again** - Forgot completely (resets interval)
+   - **Hard** - Difficult recall
+   - **Good** - Correct recall
+   - **Easy** - Perfect recall
+3. Complete your reviews and come back tomorrow!
 
-## SRS Algorithm
+### Adding Words
 
-The app uses the SM-2 spaced repetition algorithm:
-- New words start with a 1-day interval
-- Successful reviews increase the interval
-- Failed reviews reset the card
-- Each card has an ease factor that adjusts based on performance
+1. Click the **⚙️ admin button** (top-right)
+2. Click "Add New Word"
+3. **Manual Entry**: Fill in the form
+4. **WordReference Import**: 
+   - Visit `http://localhost:3000/bookmarklet.html` for the bookmarklet
+   - Use it while browsing WordReference
+   - Paste extracted JSON into the import field
 
-## PWA Installation (iOS)
+### Admin Panel
 
-1. Open the app in Safari
+Access via the top-right settings icon:
+- Add new words
+- View all vocabulary
+- Delete words
+- See review schedules and stats
+
+## 🔤 French Features
+
+- **Gender Support**: Specify le/la/les/l' for nouns
+- **Example Sentences**: Add context for better memorization
+- **Automatic Lowercasing**: Maintains consistency
+- **Gender Display**: Shows gender hint during review
+
+## 📱 PWA Installation (iOS)
+
+1. Open the app in Safari on your iPhone
 2. Tap the Share button
 3. Select "Add to Home Screen"
-4. The app will behave like a native app!
+4. App behaves like a native app with offline support!
 
-## Project Structure
+## 💾 Database & Persistence
+
+Wordy uses **IndexedDB** for storage:
+- ✅ Data persists in your browser
+- ✅ Works completely offline
+- ✅ SRS scores and history saved
+- ⚠️ Browser-specific (no cloud sync yet)
+- 💡 Clear browser data = lost vocabulary
+
+See [DATABASE.md](./DATABASE.md) for more details.
+
+## 🎯 SRS Algorithm
+
+SM-2 (SuperMemo 2) algorithm:
+- New words: 1 day interval
+- Successful reviews: Interval increases (1d → 6d → ~2w → ~1m...)
+- Failed reviews: Reset to 1 day
+- Ease factor adjusts based on performance
+- Minimum ease factor: 1.3
+
+## 📁 Project Structure
 
 ```
 app/
-  ├── page.tsx          # Dashboard/home page
-  ├── add/page.tsx      # Add new words
-  ├── review/page.tsx   # Review flashcards
-  └── layout.tsx        # Root layout
+  ├── page.tsx          # Dashboard (auto-launches reviews)
+  ├── add/page.tsx      # Add new words (manual + import)
+  ├── review/page.tsx   # Flashcard review interface
+  └── layout.tsx        # Root layout with dark theme
 lib/
-  ├── types.ts          # TypeScript types
+  ├── types.ts          # TypeScript types (French-focused)
   ├── db.ts             # IndexedDB wrapper
-  └── srs.ts            # SRS algorithm
+  ├── srs.ts            # SM-2 algorithm
+  └── wordreference.ts  # WordReference scraper utilities
 public/
-  └── manifest.json     # PWA manifest
+  ├── manifest.json     # PWA manifest
+  ├── bookmarklet.html  # Import tool instructions
+  └── icon-*.svg        # PWA icons
 ```
 
-## Future Enhancements
+## 🔮 Future Enhancements
 
-- Import from WordReference API
-- Multiple language pair support
-- Export/import vocabulary lists
-- Streak tracking
-- Audio pronunciation
-- Images for vocabulary cards
+- [ ] Cloud sync with backend database
+- [ ] Export/import vocabulary JSON
+- [ ] Streak tracking & gamification
+- [ ] Audio pronunciation
+- [ ] Images for vocabulary cards
+- [ ] Multiple language pairs
+- [ ] Conjugation support for verbs
+- [ ] More granular statistics
 
 ## Getting Started
 

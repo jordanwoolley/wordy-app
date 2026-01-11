@@ -58,21 +58,19 @@ export function calculateNextReview(
 export function createNewVocabulary(
   word: string,
   translation: string,
-  sourceLanguage: string,
-  targetLanguage: string,
   example?: string,
-  notes?: string
+  notes?: string,
+  gender?: 'le' | 'la' | 'les' | "l'"
 ): Vocabulary {
   const now = new Date();
   
   return {
     id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    word,
-    translation,
+    word: word.toLowerCase().trim(),
+    translation: translation.toLowerCase().trim(),
     example,
     notes,
-    sourceLanguage,
-    targetLanguage,
+    gender,
     createdAt: now,
     nextReview: now, // Available for review immediately
     interval: 0,

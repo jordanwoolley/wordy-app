@@ -4,8 +4,7 @@ export interface Vocabulary {
   translation: string;
   example?: string;
   notes?: string;
-  sourceLanguage: string;
-  targetLanguage: string;
+  gender?: 'le' | 'la' | 'les' | "l'"; // French gender
   createdAt: Date;
   nextReview: Date;
   interval: number; // days until next review
