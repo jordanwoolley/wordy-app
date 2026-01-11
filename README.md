@@ -1,4 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wordy - Vocabulary SRS App
+
+A spaced repetition flashcard web app for vocabulary practice, optimized for iOS and deployable on Vercel.
+
+## Features
+
+- 📚 Add and manage vocabulary words with translations
+- 🧠 SM-2 spaced repetition algorithm (like WaniKani)
+- 📱 PWA support for iOS - install as a native-like app
+- 💾 Client-side storage with IndexedDB
+- 📊 Progress tracking and statistics
+- 🎨 Clean, mobile-optimized interface
+
+## Tech Stack
+
+- **Next.js 16** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **IndexedDB** - Local storage
+- **PWA** - Progressive Web App features
+
+## Getting Started
+
+### Development
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+### Deploy to Vercel
+
+The easiest way to deploy:
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Import your repository
+4. Deploy!
+
+Vercel will automatically detect Next.js and configure everything.
+
+## Usage
+
+1. **Add Words**: Click "Add New Word" to add vocabulary
+2. **Review**: Click "Start Review" when words are due
+3. **Rate Your Recall**: After reviewing, rate how well you knew the word:
+   - ❌ Again - Forgot completely (resets the card)
+   - 😐 Hard - Difficult to recall
+   - 👍 Good - Recalled correctly
+   - ✨ Easy - Perfect recall
+
+## SRS Algorithm
+
+The app uses the SM-2 spaced repetition algorithm:
+- New words start with a 1-day interval
+- Successful reviews increase the interval
+- Failed reviews reset the card
+- Each card has an ease factor that adjusts based on performance
+
+## PWA Installation (iOS)
+
+1. Open the app in Safari
+2. Tap the Share button
+3. Select "Add to Home Screen"
+4. The app will behave like a native app!
+
+## Project Structure
+
+```
+app/
+  ├── page.tsx          # Dashboard/home page
+  ├── add/page.tsx      # Add new words
+  ├── review/page.tsx   # Review flashcards
+  └── layout.tsx        # Root layout
+lib/
+  ├── types.ts          # TypeScript types
+  ├── db.ts             # IndexedDB wrapper
+  └── srs.ts            # SRS algorithm
+public/
+  └── manifest.json     # PWA manifest
+```
+
+## Future Enhancements
+
+- Import from WordReference API
+- Multiple language pair support
+- Export/import vocabulary lists
+- Streak tracking
+- Audio pronunciation
+- Images for vocabulary cards
 
 ## Getting Started
 
